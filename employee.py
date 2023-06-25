@@ -1,3 +1,5 @@
+# Author: Meseret Alemnew Melese
+
 from os import system
 import re
 # importing mysql connector
@@ -11,29 +13,26 @@ con = mysql.connector.connect(
   database="EmployeeDB"
 )
 
-# Function to add elements in all tables
+# Functions to add elements in all tables
 def add_Dependent():
     print("{:>60}".format("-->>Add DEPENDENT Record<<--"))
-    DID = input("ENTER DEPENDENT ID: ")
-    if (check_DEPENDENT(DID) == True):
-        print("DEPENDENT ID Already Exists\nTry Again..")
+    NAME = input("ENTER DEPENDENT NAME: ")
+    if (check_DEPENDENT_NAME(NAME) == True):
+        print("Dependent Name is Already Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         add_Dependent()
     EID = input("ENTER EMPLOYEE ID: ")
-    if (check_employee(EID) == False):
+    if EID == "":
+        EID = None
+    elif check_employee(EID) == False:
         print("EMPLOYEE ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         menu()
     birth_date = input("ENTER Birth Date: ")
-    NAME = input("ENTER NAME: ")
-    if (check_DEPENDENT_NAME(NAME) == True):
-        print("Employee Name Already Exists\nTry Again..")
-        press = input("Press Any Key To Continue..")
-        add_Dependent()
     relationship = input("enter relationship: ")
     sex = input("enter sex: ")
-    data = (DID, birth_date,  NAME, relationship, sex, EID)
-    sql = 'insert into dependent values(%s,%s,%s,%s,%s,%s)'
+    data = (NAME, birth_date,  relationship, sex, EID)
+    sql = 'insert into dependent values(%s,%s,%s,%s,%s)'
     c = con.cursor()
     c.execute(sql, data)
     con.commit()
@@ -48,21 +47,23 @@ def Add_Employ():
         print("Employee ID Already Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         Add_Employ()
-    JTId = input("Enter JOB TITLE Id: ")
-    if (check_job_title(JTId) == False):
+    JTId = input("Enter JOB TITLE NAME: ")
+    if JTId == "":
+        JTId = None
+    elif (check_job_title(JTId) == False):
         print("JOB TITLE ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         menu()
+
     SId = input("Enter supervisor Id: ")
-    if (check_supervisor(SId) == False):
+    if SId == "":
+        SId = None
+    
+    elif check_supervisor(SId) == False:
         print("supervisor ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         menu()
     Name = input("Enter Employee Name: ")
-    if (check_employee_name(Name) == True):
-        print("Employee Name Already Exists\nTry Again..")
-        press = input("Press Any Key To Continue..")
-        Add_Employ()
     MNAME = input("Enter Employee Middle Name: ")
     LNAME = input("Enter Employee Last Name: ")
     birth_day = input("Enter Employee birth day: ")
@@ -80,16 +81,15 @@ def Add_Employ():
 
 def add_job_title():
     print("{:>60}".format("-->>Add JOB_TITLE Record<<--"))
-    JTID = input("ENTER JOB_TITLE ID: ")
+    JTID = input("ENTER JOB_TITLE NAME: ")
     if (check_job_title(JTID) == True):
         print("JOB_TITLE ID Already Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         add_job_title()
-    JT = input("ENTER JOB TITLE: ")
     MAX_SALARY = input("ENTER THE MAX SALARY: ")
     MIN_SALARY = input("ENTER THE MIN SALARY: ")
-    data = (JTID, JT,  MIN_SALARY, MAX_SALARY)
-    sql = 'insert into job_titles values(%s,%s,%s,%s)'
+    data = (JTID, MIN_SALARY, MAX_SALARY)
+    sql = 'insert into job_titles values(%s,%s,%s)'
     c = con.cursor()
     c.execute(sql, data)
     con.commit()
@@ -97,50 +97,27 @@ def add_job_title():
     press = input("Press Any Key To Continue..")
     menu()
 
-def add_supervisor():
-    print("{:>60}".format("-->>Add SUPERVISOR Record<<--"))
-    SID = input("ENTER SUPERVISOR ID: ")
-    if (check_supervisor(SID) == True):
-        print("SUPERVISOR ID Already Exists\nTry Again..")
-        press = input("Press Any Key To Continue..")
-        add_supervisor()
-    F_NAME = input("ENTER FIRST NAME: ")
-    if (check_supervisor_name(F_NAME) == True):
-        print("supervisor Name Already Exists\nTry Again..")
-        press = input("Press Any Key To Continue..")
-        add_supervisor()
-    L_NAME = input("ENTER LAST NAME: ")
-    data = (SID, F_NAME, L_NAME)
-    sql = 'insert into supervisor values(%s,%s,%s)'
-    c = con.cursor()
-    c.execute(sql, data)
-    con.commit()
-    print("Successfully Added supervisor Record")
-    press = input("Press Any Key To Continue..")
-    menu()
-
 def add_Department():
     print("{:>60}".format("-->>Add DEPARTMENT Record<<--"))
-    DID = input("ENTER DEPARTMENT ID: ")
+    DID = input("ENTER DEPARTMENT NAME: ")
     if (check_DEPARTMENT(DID) == True):
         print("DEPARTMENT ID Already Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         add_Department()
     EID = input("ENTER EMPLOYEE ID: ")
-    if (check_employee(EID) == False):
+    if EID == "":
+        EID = None
+    elif check_employee(EID) == False:
         print("EMPLOYEE ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         menu()
     LOCATION = input("ENTER LOCATION: ")
-    NAME = input("ENTER NAME: ")
-    if (check_Department_name(NAME) == True):
-        print("Employee Name Already Exists\nTry Again..")
-        press = input("Press Any Key To Continue..")
-        add_Department()
-    no_of_employee = input("enter number of employee: ")
+    cursor = con.cursor()
+    cursor.execute('SELECT COUNT(*) FROM department')
+    no_of_employee = cursor.fetchone()[0]
     start_date = input("enter the start_date: ")
-    data = (DID, no_of_employee, LOCATION,  NAME, start_date, EID)
-    sql = 'insert into department values(%s,%s,%s,%s,%s,%s)'
+    data = (DID, no_of_employee, LOCATION, start_date, EID)
+    sql = 'insert into department values(%s,%s,%s,%s,%s)'
     c = con.cursor()
     c.execute(sql, data)
     con.commit()
@@ -178,12 +155,11 @@ def add_works():
     if (check_PROJECT(PID) == False):
         print("PROJECT ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
-        add_works()
+        menu()
     EID = input("ENTER EMPLOYEE ID: ")
     if (check_employee(EID) == False):
         print("DPARTMENT ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
-        add_works()
         menu()
 
     if PID == EID:
@@ -204,45 +180,53 @@ def add_works():
 
 def add_Project():
     print("{:>60}".format("-->>Add PROJECT Record<<--"))
-    PID = input("ENTER PROJECT ID: ")
+    PID = input("ENTER PROJECT Name: ")
     if (check_PROJECT(PID) == True):
         print("PROJECT ID Already Exists\nTry Again..")
-        press = input("Press Any Key To Continue..")
-        add_Project()
-    NAME = input("ENTER NAME: ")
-    if (check_PROJECT_NAME(NAME) == True):
-        print("project Name Already Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         add_Project()
     BUDGET = input("ENTER BUDGET: ")
     location = input("Enter location: ")
     DID = input("ENTER DPARTMENT ID: ")
-    if (check_DEPARTMENT(DID) == False):
+    if DID == "":
+        DID = None
+    elif check_DEPARTMENT(DID) == False:
         print("DPARTMENT ID DOSEN'T Exists\nTry Again..")
         press = input("Press Any Key To Continue..")
         add_Project()
-    data = (PID, NAME ,BUDGET ,location ,DID)
-    sql = 'insert into project values(%s,%s,%s,%s,%s)'
+    data = (PID, BUDGET ,location ,DID)
+    sql = 'insert into project values(%s,%s,%s,%s)'
     c = con.cursor()
     c.execute(sql, data)
     con.commit()
     print("Successfully Added project Record")
     press = input("Press Any Key To Continue..")
     menu()
-
+  
+def check_supervisor(supervisor_id):
+    sql = 'select * from employee where Supervisor_ID=%s'
+    c = con.cursor(buffered=True)
+    data = (supervisor_id,)
+    c.execute(sql, data)
+    r = c.rowcount
+    if r >= 1:
+        return True
+    else:
+        return False
+  
 def check_PROJECT(PROJECT_id):
-    sql = 'select * from project where project_ID=%s'
+    sql = 'select * from project where project_name=%s'
     c = con.cursor(buffered=True)
     data = (PROJECT_id,)
     c.execute(sql, data)
     r = c.rowcount
-    if r == 1:
+    if r >= 1:
         return True
     else:
         return False
   
 def check_PROJECT_D(PROJECT_id):
-    sql = 'select * from project where department_ID=%s'
+    sql = 'select * from project where department_name=%s'
     c = con.cursor(buffered=True)
     data = (PROJECT_id,)
     c.execute(sql, data)
@@ -269,7 +253,7 @@ def check_work_p(P_id):
     data = (P_id,)
     c.execute(sql, data)
     r = c.rowcount
-    if r == 1:
+    if r >= 1:
         return True
     else:
         return False
@@ -284,18 +268,7 @@ def check_PROJECT_NAME(project_name):
         return True
     else:
         return False
- 
-def check_DEPENDENT(Dependent_id):
-    sql = 'select * from dependent where dependent_ID=%s'
-    c = con.cursor(buffered=True)
-    data = (Dependent_id,)
-    c.execute(sql, data)
-    r = c.rowcount
-    if r == 1:
-        return True
-    else:
-        return False
- 
+
 def check_DEPENDENT_E(Dependent_id):
     sql = 'select * from dependent where EMPLOYEE_ID=%s'
     c = con.cursor(buffered=True)
@@ -308,23 +281,23 @@ def check_DEPENDENT_E(Dependent_id):
         return False
     
 def check_DEPENDENT_NAME(employee_name):
-    sql = 'select * from dependent where name=%s'
+    sql = 'select * from dependent where dependent_name=%s'
     c = con.cursor(buffered=True)
     data = (employee_name,)
     c.execute(sql, data)
     r = c.rowcount
-    if r == 1:
+    if r >= 1:
         return True
     else:
         return False
     
 def check_DEPARTMENT(department_id):
-    sql = 'select * from department where department_ID=%s'
+    sql = 'select * from department where department_name=%s'
     c = con.cursor(buffered=True)
     data = (department_id,)
     c.execute(sql, data)
     r = c.rowcount
-    if r == 1:
+    if r >= 1:
         return True
     else:
         return False
@@ -340,28 +313,6 @@ def check_DEPARTMENT_E(department_id):
     else:
         return False
     
-def check_Department_name(department_name):
-    sql = 'select * from department where name=%s'
-    c = con.cursor(buffered=True)
-    data = (department_name,)
-    c.execute(sql, data)
-    r = c.rowcount
-    if r == 1:
-        return True
-    else:
-        return False
- 
-def check_supervisor_name(supervisor_name):
-    sql = 'select * from supervisor where FirstName=%s'
-    c = con.cursor(buffered=True)
-    data = (supervisor_name,)
-    c.execute(sql, data)
-    r = c.rowcount
-    if r == 1:
-        return True
-    else:
-        return False
-
 def check_Attendance(Attendance_id):
     sql = 'select * from attendance where attendance_ID=%s'
     c = con.cursor(buffered=True)
@@ -384,17 +335,6 @@ def check_Attendance_E(Attendance_id):
     else:
         return False
  
-def check_employee_name(employee_name):
-    sql = 'select * from employee where first_name=%s'
-    c = con.cursor(buffered=True)
-    data = (employee_name,)
-    c.execute(sql, data)
-    r = c.rowcount
-    if r == 1:
-        return True
-    else:
-        return False
-
 def check_employee(employee_id):
     sql = 'select * from employee where EMPLOYEE_ID=%s'
     c = con.cursor(buffered=True)
@@ -412,23 +352,12 @@ def check_job_title(job_title_id):
     data = (job_title_id,)
     c.execute(sql, data)
     r = c.rowcount
-    if r == 1:
+    if r >= 1:
         return True
     else:
         return False
-        
-def check_supervisor(supervisor_id):
-    sql = 'select * from supervisor where Supervisor_ID=%s'
-    c = con.cursor(buffered=True)
-    data = (supervisor_id,)
-    c.execute(sql, data)
-    r = c.rowcount
-    if r == 1:
-        return True
-    else:
-        return False
-
-# Function to Display contents of all tables
+ 
+# Functions to Display contents of all tables
 def Display_Employ():
     print("{:>60}".format("-->> Display Employee Record <<--"))
     sql = 'select * from employee'
@@ -478,7 +407,6 @@ def Display_Department():
         print("location: ", i[2])
         print("name: ", i[3])
         print("start date: ", i[4])
-        print("employee Id: ", i[5])
         print("\n")
     press = input("Press Any key To Continue..")
     menu()
@@ -495,7 +423,6 @@ def Display_dependent():
         print("name: ", i[2])
         print("relationship: ", i[3])
         print("sex: ", i[4])
-        print("employee Id: ", i[5])
         print("\n")
     press = input("Press Any key To Continue..")
     menu()
@@ -510,7 +437,6 @@ def Display_job_titles():
         print("job title Id: ", i[0])
         print("job title: ", i[1])
         print("min salary: ", i[2])
-        print("max salary: ", i[3])
         print("\n")
     press = input("Press Any key To Continue..")
     menu()
@@ -522,25 +448,11 @@ def Display_project():
     c.execute(sql)
     r = c.fetchall()
     for i in r:
-        print("project Id: ", i[0])
-        print("name: ", i[1])
-        print("budget: ", i[2])
-        print("location: ", i[3])
-        print("department Id: ", i[4])
         print("\n")
-    press = input("Press Any key To Continue..")
-    menu()
-
-def Display_supervisor():
-    print("{:>60}".format("-->> Display supervisor Record <<--"))
-    sql = 'select * from supervisor'
-    c = con.cursor()
-    c.execute(sql)
-    r = c.fetchall()
-    for i in r:
-        print("supervisor Id: ", i[0])
-        print("First Name: ", i[1])
-        print("Last Name: ", i[2])
+        print("project Name: ", i[0])
+        print("budget: ", i[1])
+        print("location: ", i[2])
+        print("department Id: ", i[3])
         print("\n")
     press = input("Press Any key To Continue..")
     menu()
@@ -560,11 +472,10 @@ def Display_works():
     press = input("Press Any key To Continue..")
     menu()
 
-# Function to Update values of all tables
+# Functions to Update values of all tables
 def Update_Employ():
     print("{:>60}".format("-->> Update Employee Record <<--\n"))
     Id = input("Enter Employee Id: ")
-    # checking If Employee Id is Exit Or Not
     if(check_employee(Id) == False):
         print("Employee Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
@@ -604,23 +515,17 @@ def Update_attendance():
 
 def Update_Department():
     print("{:>60}".format("-->> Update Department Record <<--\n"))
-    Id = input("Enter Department Id: ")
+    Id = input("Enter Department Name: ")
     # checking If Employee Id is Exit Or Not
     if(check_DEPARTMENT(Id) == False):
         print("Department Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         Update_Department()
     else:
-        NAME = input("Update NAME: ")
-        if (check_Department_name(NAME) == True):
-            print("Employee Name Already Exists\nTry Again..")
-            press = input("Press Any Key To Continue..")
-            Update_Department()
         LOCATION = input("Update LOCATION: ")
-        no_of_employee = input("Update number of employee: ")
         start_date = input("Update the start date: ")
-        sql = 'UPDATE department set location = %s, name = %s, number_of_employee = %s, start_date = %s where department_ID = %s'
-        data = (LOCATION ,NAME , no_of_employee, start_date, Id)
+        sql = 'UPDATE department set location = %s, start_date = %s where department_name = %s'
+        data = (LOCATION , start_date, Id)
         c = con.cursor()
         c.execute(sql, data)
         con.commit()
@@ -630,22 +535,17 @@ def Update_Department():
 
 def Update_dependent():
     print("{:>60}".format("-->> Update Dependent Record <<--\n"))
-    Id = input("Enter Dependent Id: ")
-    if(check_DEPENDENT(Id) == False):
+    Id = input("Enter Dependent Name: ")
+    if(check_DEPENDENT_NAME(Id) == False):
         print("Dependent Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         Update_dependent()
     else:
-        NAME = input("Update NAME: ")
-        if (check_DEPENDENT_NAME(NAME) == True):
-            print("Dependent Name Already Exists\nTry Again..")
-            press = input("Press Any Key To Continue..")
-            Update_dependent()
         birth_date = input("Update Birth Date: ")
         relationship = input("Update relationship: ")
         sex = input("Update sex: ")
-        sql = 'UPDATE dependent set birth_date = %s, name = %s, relationship = %s, sex = %s where employee_id = %s'
-        data = (birth_date , NAME, relationship, sex, Id)
+        sql = 'UPDATE dependent set birth_date = %s, relationship = %s, sex = %s where dependent_name = %s'
+        data = (birth_date , relationship, sex, Id)
         c = con.cursor()
         c.execute(sql, data)
         con.commit()
@@ -655,18 +555,16 @@ def Update_dependent():
 
 def Update_job_titles():
     print("{:>60}".format("-->> Update Job Titles Record <<--\n"))
-    Id = input("Enter job_title_Id: ")
-    # checking If Employee Id is Exit Or Not
+    Id = input("Enter job_title Name: ")
     if(check_job_title(Id) == False):
         print("Job Titles Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         Update_job_titles()
     else:
-        JT = input("Update JOB TITLE: ")
         MAX_SALARY = input("Update THE MAX SALARY: ")
         MIN_SALARY = input("Update THE MIN SALARY: ")
-        sql = 'UPDATE job_titles set job_title = %s, max_salary = %s, min_salary = %s where JOB_TITLE_ID = %s'
-        data = (JT, MAX_SALARY, MIN_SALARY, Id)
+        sql = 'UPDATE job_titles set max_salary = %s, min_salary = %s where JOB_TITLE_ID = %s'
+        data = (MAX_SALARY, MIN_SALARY, Id)
         c = con.cursor()
         c.execute(sql, data)
         con.commit()
@@ -676,49 +574,20 @@ def Update_job_titles():
 
 def Update_Project():
     print("{:>60}".format("-->> Update Project Record <<--\n"))
-    Id = input("Enter Project Id: ")
-    # checking If Employee Id is Exit Or Not
+    Id = input("Enter Project Name: ")
     if(check_PROJECT(Id) == False):
-        print("Employee Record Not exists\nTry Again")
+        print("Project Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         Update_Project()
     else:
-        NAME = input("Update NAME: ")
-        if (check_PROJECT_NAME(NAME) == True):
-            print("project Name Already Exists\nTry Again..")
-            press = input("Press Any Key To Continue..")
-            Update_Project()
         BUDGET = input("Update BUDGET: ")
         location = input("Update location: ")
-        sql = 'UPDATE project set name = %s, location = %s, budget = %s where project_ID = %s'
-        data = (NAME, BUDGET, location, Id)
+        sql = 'UPDATE project set location = %s, budget = %s where project_name = %s'
+        data = (BUDGET, location, Id)
         c = con.cursor()
         c.execute(sql, data)
         con.commit()
         print("Updated Project Record")
-        press = input("Press Any Key To Continue..")
-        menu()
-
-def Update_Supervisor():
-    print("{:>60}".format("-->> Update Supervisor Record <<--\n"))
-    Id = input("Enter Supervisor Id: ")
-    if(check_supervisor(Id) == False):
-        print("Supervisor Record Not exists\nTry Again")
-        press = input("Press Any Key To Continue..")
-        Update_Supervisor()
-    else:
-        F_NAME = input("Update FIRST NAME: ")
-        if (check_supervisor_name(F_NAME) == True):
-            print("supervisor Name Already Exists\nTry Again..")
-            press = input("Press Any Key To Continue..")
-            Update_Supervisor()
-        L_NAME = input("Update LAST NAME: ")
-        sql = 'UPDATE supervisor set FirstName = %s, LastName = %s where Supervisor_ID = %s'
-        data = (F_NAME, L_NAME, Id)
-        c = con.cursor()
-        c.execute(sql, data)
-        con.commit()
-        print("Updated Supervisor Record")
         press = input("Press Any Key To Continue..")
         menu()
 
@@ -742,7 +611,7 @@ def Update_Works():
         press = input("Press Any Key To Continue..")
         menu()
 
-# Function to Promote values all tables
+# Functions to Promote values all tables
 def Promote_Employ():
     print("{:>60}".format("-->> Promote Employee Record <<--\n"))
     Id = input("Enter Employee Id: ")
@@ -752,7 +621,7 @@ def Promote_Employ():
         menu()
     else:
         Amount  = int(input("Enter Increase Salary: "))
-        sql = 'select Salary from employee where Id=%s'
+        sql = 'select Salary from employee where EMPLOYEE_ID=%s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
@@ -770,7 +639,7 @@ def Promote_Job_titles():
     print("{:>60}".format("-->> Promote Job Title Record <<--\n"))
     Id = input("Enter Job Title Id: ")
     if(check_job_title(Id) == False):
-        print("Employee Record Not exists\nTry Again")
+        print("Job title Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
     else:
@@ -799,13 +668,13 @@ def Promote_Project():
         menu()
     else:
         Amount  = int(input("Enter Increase budget: "))
-        sql = 'select budget from project where project_ID=%s'
+        sql = 'select budget from project where project_name=%s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
         r = c.fetchone()
         t = r[0]+Amount
-        sql = 'update project set budget = %s where project_ID = %s'
+        sql = 'update project set budget = %s where project_name = %s'
         d = (t, Id)
         c.execute(sql, d)
         con.commit()
@@ -813,7 +682,7 @@ def Promote_Project():
         press = input("Press Any key To Continue..")
         menu()
 
-# Function to Remove all tables
+# Functions to Remove all tables
 def Remove_Employ():
     print("{:>60}".format("-->> Remove Employee Record <<--\n"))
     Id = input("Enter Employee Id: ")
@@ -842,7 +711,7 @@ def Remove_Employ():
             c.execute(sql, data)
             con.commit()
         if(check_DEPARTMENT_E(Id) == True):
-            sql = 'select department_ID from department where EMPLOYEE_ID = %s'
+            sql = 'select department_name from department where EMPLOYEE_ID = %s'
             data = (Id,)
             c = con.cursor()
             c.execute(sql, data)
@@ -850,24 +719,24 @@ def Remove_Employ():
             for i in range(len(department_ids)):
                 department_id = department_ids[i][0]
                 if(check_PROJECT_D(department_id) == True):
-                    sql = 'select project_ID from project where department_ID = %s'
+                    sql = 'select project_ID from project where department_name = %s'
                     data = (department_id,)
                     c = con.cursor()
                     c.execute(sql, data)
                     project_ids = c.fetchall()
                     for i in range(len(project_ids)):
                         project_id = project_ids[i][0]
-                        sql = 'delete from works where project_ID = %s'
+                        sql = 'delete from works where project_name = %s'
                         data = (project_id,)
                         c = con.cursor()
                         c.execute(sql, data)
                         con.commit()
-                    sql = 'delete from project where department_ID = %s'
+                    sql = 'delete from project where department_name = %s'
                     data = (department_id,)
                     c = con.cursor()
                     c.execute(sql, data)
                     con.commit()
-                sql = 'delete from department where department_ID = %s'
+                sql = 'delete from department where department_name = %s'
                 data = (department_id,)
                 c = con.cursor()
                 c.execute(sql, data)
@@ -881,7 +750,7 @@ def Remove_Employ():
         print("Employee Removed")
         press = input("Press Any key To Continue..")
         menu()
-      
+
 def Remove_Attendance():
     print("{:>60}".format("-->> Remove Attendance Record <<--\n"))
     Id = input("Enter Attendance Id: ")
@@ -898,7 +767,7 @@ def Remove_Attendance():
         print("Attendance Removed")
         press = input("Press Any key To Continue..")
         menu()
-        
+
 def Remove_Department():
     print("{:>60}".format("-->> Remove Department Record <<--\n"))
     Id = input("Enter Department Id: ")
@@ -909,25 +778,25 @@ def Remove_Department():
     
     else:
         if(check_PROJECT_D(Id) == True):
-            sql = 'select project_ID from project where department_ID = %s'
+            sql = 'select project_ID from project where department_name = %s'
             data = (Id,)
             c = con.cursor()
             c.execute(sql, data)
             project_ids = c.fetchall()
             for i in range(len(project_ids)):
                 project_id = project_ids[i][0]
-                sql = 'delete from works where project_ID = %s'
+                sql = 'delete from works where project_name = %s'
                 data = (project_id,)
                 c = con.cursor()
                 c.execute(sql, data)
                 con.commit()
-            sql = 'delete from project where department_ID = %s'
+            sql = 'delete from project where department_name = %s'
             data = (Id,)
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
 
-        sql = 'delete from department where department_ID = %s'
+        sql = 'delete from department where department_name = %s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
@@ -935,16 +804,17 @@ def Remove_Department():
         print("Department Removed")
         press = input("Press Any key To Continue..")
         menu()
-        
+
 def Remove_Dependent():
     print("{:>60}".format("-->> Remove Dependent Record <<--\n"))
     Id = input("Enter Dependent Id: ")
-    if(check_DEPENDENT(Id) == False):
+    if(check_DEPENDENT_NAME(Id) == False):
         print("Dependent Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
+
     else:
-        sql = 'delete from dependent where dependent_ID = %s'
+        sql = 'delete from dependent where dependent_name = %s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
@@ -952,7 +822,7 @@ def Remove_Dependent():
         print("Dependent Removed")
         press = input("Press Any key To Continue..")
         menu()
-        
+
 def Remove_job_titles():
     print("{:>60}".format("-->> Remove Job Title Record <<--\n"))
     Id = input("Enter Job Titles Id: ")
@@ -988,7 +858,7 @@ def Remove_job_titles():
                 c.execute(sql, data)
                 con.commit()
             if(check_DEPARTMENT_E(EMPLOYEE_ID) == True):
-                sql = 'select department_ID from department where EMPLOYEE_ID = %s'
+                sql = 'select department_name from department where EMPLOYEE_ID = %s'
                 data = (EMPLOYEE_ID,)
                 c = con.cursor()
                 c.execute(sql, data)
@@ -996,7 +866,7 @@ def Remove_job_titles():
                 for i in range(len(department_ids)):
                     department_id = department_ids[i][0]
                     if(check_PROJECT_D(department_id) == True):
-                        sql = 'select project_ID from project where department_ID = %s'
+                        sql = 'select project_name from project where department_name = %s'
                         data = (department_id,)
                         c = con.cursor()
                         c.execute(sql, data)
@@ -1008,12 +878,12 @@ def Remove_job_titles():
                             c = con.cursor()
                             c.execute(sql, data)
                             con.commit()
-                        sql = 'delete from project where department_ID = %s'
+                        sql = 'delete from project where department_name = %s'
                         data = (department_id,)
                         c = con.cursor()
                         c.execute(sql, data)
                         con.commit()
-                    sql = 'delete from department where department_ID = %s'
+                    sql = 'delete from department where department_name = %s'
                     data = (department_id,)
                     c = con.cursor()
                     c.execute(sql, data)
@@ -1033,7 +903,7 @@ def Remove_job_titles():
         print("Job Title Removed")
         press = input("Press Any key To Continue..")
         menu()
-        
+
 def Remove_Project():
     print("{:>60}".format("-->> Remove Project Record <<--\n"))
     Id = input("Enter Project Id: ")
@@ -1044,12 +914,12 @@ def Remove_Project():
 
     else:
         if(check_work_e(Id) == True):
-            sql = 'delete from works where project_ID = %s'
+            sql = 'delete from works where project_name = %s'
             data = (Id,)
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
-        sql = 'delete from project where project_ID = %s'
+        sql = 'delete from project where project_name = %s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
@@ -1057,24 +927,7 @@ def Remove_Project():
         print("Project Removed")
         press = input("Press Any key To Continue..")
         menu()
-        
-def Remove_supervisor():
-    print("{:>60}".format("-->> Remove Supervisor Record <<--\n"))
-    Id = input("Enter Supervisor Id: ")
-    if(check_supervisor(Id) == False):
-        print("Supervisor Record Not exists\nTry Again")
-        press = input("Press Any Key To Continue..")
-        menu()
-    else:
-        sql = 'delete from supervisor where Supervisor_ID = %s'
-        data = (Id,)
-        c = con.cursor()
-        c.execute(sql, data)
-        con.commit()
-        print("Supervisor Removed")
-        press = input("Press Any key To Continue..")
-        menu()
-        
+
 def Remove_works():
     print("{:>60}".format("-->> Remove Works Record <<--\n"))
     Id = input("Enter Works Id: ")
@@ -1082,14 +935,14 @@ def Remove_works():
         print("Employee Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
-    PID = input("ENTER PROJECT ID: ")
+    PID = input("ENTER PROJECT Name: ")
     if (check_PROJECT(PID) == False):
         print("PROJECT Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
 
     else:
-        sql = 'DELETE FROM works WHERE EMPLOYEE_ID = %s AND project_ID = %s'
+        sql = 'DELETE FROM works WHERE EMPLOYEE_ID = %s AND project_name = %s'
         data = (Id, PID)
         c = con.cursor()
         c.execute(sql, data)
@@ -1098,7 +951,7 @@ def Remove_works():
         press = input("Press Any key To Continue..")
         menu()
          
-# Function to Search all tables
+# Functions to Search all tables
 def Search_Employ():
     print("{:>60}".format("-->> Search Employee Record <<--\n"))
     Id = input("Enter Employee Id: ")
@@ -1106,6 +959,7 @@ def Search_Employ():
         print("Employee Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
+
     else:
         sql = 'select * from employee where EMPLOYEE_ID = %s'
         data = (Id,)
@@ -1113,13 +967,17 @@ def Search_Employ():
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
+            print("\n")
             print("Employee Id: ", i[0])
-            print("Employee Name: ", i[1])
-            print("Employee Email Id: ", i[2])
-            print("Employee Phone No.: ", i[3])
-            print("Employee Address: ", i[4])
-            print("Employee Post: ", i[5])
+            print("Employee birth date: ", i[1])
+            print("Employee first name: ", i[2])
+            print("Employee middle name.: ", i[3])
+            print("Employee last name.: ", i[4])
+            print("Employee sex: ", i[5])
             print("Employee Salary: ", i[6])
+            print("Employee Address: ", i[7])
+            print("Employee supervisor_ID: ", i[8])
+            print("Employee JOB_TITLE_ID: ", i[9])
             print("\n")
         press = input("Press Any key To Continue..")
         menu()
@@ -1139,6 +997,7 @@ def Search_Attendance():
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
+            print("\n")
             print("Attendance Id: ", i[0])
             print("Attendance date: ", i[1])
             print("check in time: ", i[2])
@@ -1157,37 +1016,38 @@ def Search_department():
         menu()
 
     else:
-        sql = 'select * from department where department_ID = %s'
+        sql = 'select * from department where department_name = %s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
-            print("Department Id: ", i[0])
+            print("\n")
+            print("Department Name: ", i[0])
             print("number of employee: ", i[1])
             print("location: ", i[2])
-            print("name: ", i[3])
-            print("start date: ", i[4])
-            print("employee Id: ", i[5])
+            print("start date: ", i[3])
+            print("employee Id: ", i[4])
             print("\n")
         press = input("Press Any key To Continue..")
         menu()
 
 def Search_dependent():
     print("{:>60}".format("-->> Search Dependent Record <<--\n"))
-    Id = input("Enter Dependent Id: ")
-    if(check_DEPENDENT(Id) == False):
+    Id = input("Enter Dependent Name: ")
+    if(check_DEPENDENT_NAME(Id) == False):
         print("Dependent Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
+
     else:
-        sql = 'select * from dependent where dependent_ID = %s'
+        sql = 'select * from dependent where dependent_name = %s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
-            print("dependent Id: ", i[0])
+            print("dependent Name: ", i[0])
             print("birth date: ", i[1])
             print("name: ", i[2])
             print("relationship: ", i[3])
@@ -1199,11 +1059,12 @@ def Search_dependent():
 
 def Search_job_title():
     print("{:>60}".format("-->> Search Job Title Record <<--\n"))
-    Id = input("Enter Job Title Id: ")
+    Id = input("Enter Job Title Name: ")
     if(check_job_title(Id) == False):
         print("Job Title Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
+
     else:
         sql = 'select * from job_titles where JOB_TITLE_ID = %s'
         data = (Id,)
@@ -1211,10 +1072,10 @@ def Search_job_title():
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
-            print("job title Id: ", i[0])
-            print("job title: ", i[1])
-            print("min salary: ", i[2])
-            print("max salary: ", i[3])
+            print("\n")
+            print("job title Name: ", i[0])
+            print("min salary: ", i[1])
+            print("max salary: ", i[2])
             print("\n")
         press = input("Press Any key To Continue..")
         menu()
@@ -1226,41 +1087,20 @@ def Search_project():
         print("Project Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
+
     else:
-        sql = 'select * from project where project_ID = %s'
+        sql = 'select * from project where project_name = %s'
         data = (Id,)
         c = con.cursor()
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
-            print("project Id: ", i[0])
-            print("name: ", i[1])
-            print("budget: ", i[2])
-            print("location: ", i[3])
-            print("department Id: ", i[4])
             print("\n")
-        press = input("Press Any key To Continue..")
-        menu()
-
-def Search_supervisor():
-    print("{:>60}".format("-->> Search Supervisor Record <<--\n"))
-    Id = input("Enter Supervisor Id: ")
-    if(check_supervisor(Id) == False):
-        print("Supervisor Record Not exists\nTry Again")
-        press = input("Press Any Key To Continue..")
-        menu()
-    else:
-        sql = 'select * from supervisor where Supervisor_ID = %s'
-        data = (Id,)
-        c = con.cursor()
-        c.execute(sql, data)
-        r = c.fetchall()
-        for i in r:
-            print("supervisor Id: ", i[0])
-            print("First Name: ", i[1])
-            print("Last Name: ", i[2])
+            print("project Name: ", i[0])
+            print("budget: ", i[1])
+            print("location: ", i[2])
+            print("department Id: ", i[3])
             print("\n")
-
         press = input("Press Any key To Continue..")
         menu()
 
@@ -1278,6 +1118,7 @@ def Search_works():
         c.execute(sql, data)
         r = c.fetchall()
         for i in r:
+            print("\n")
             print("Employee Id: ", i[0])
             print("project Id: ", i[1])
             print("hours: ", i[2])
@@ -1286,7 +1127,7 @@ def Search_works():
         press = input("Press Any key To Continue..")
         menu()
 
-#Function to controll all tables
+#Functions to controll all tables
 def employeeTable():
     print("{:>60}".format("-->> EMPLOYEE TABLE <<--")) 
     print("1. Add Employee")
@@ -1296,7 +1137,7 @@ def employeeTable():
     print("5. Remove Employee Record")
     print("6. Search Employee Record")
     print("7. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6/7] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6/7] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1334,7 +1175,7 @@ def attendanceTable():
     print("4. Remove ATTENDANCE Record")
     print("5. Search ATTENDANCE Record")
     print("6. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1369,7 +1210,7 @@ def departmentTable():
     print("4. Remove DEPARTMENT Record")
     print("5. Search DEPARTMENT Record")
     print("6. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1404,7 +1245,7 @@ def dependentTable():
     print("4. Remove DEPENDENT Record")
     print("5. Search DEPENDENT Record")
     print("6. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1440,7 +1281,7 @@ def jobtitleTable():
     print("5. Remove JOB_TITLE Record")
     print("6. Search JOB_TITLE Record")
     print("7. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6/7] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6/7] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1479,7 +1320,7 @@ def projectTable():
     print("5. Remove PROJECT Record")
     print("6. Search PROJECT Record")
     print("7. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6/7] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6/7] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1509,41 +1350,6 @@ def projectTable():
         press = input("Press Any key To Continue..")
         menu()
 
-def supervisorTable():
-    print("{:>60}".format("-->> SUPERVISOR TABLE <<--")) 
-    print("1. Add SUPERVISOR")
-    print("2. Display SUPERVISOR Record")
-    print("3. Update SUPERVISOR Record")
-    print("4. Remove SUPERVISOR Record")
-    print("5. Search SUPERVISOR Record")
-    print("6. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
-
-    ch = int(input("Enter your Choice: "))
-    if ch == 1:
-        system("cls")
-        add_supervisor()
-    elif ch == 2:
-        system("cls")
-        Display_supervisor()
-    elif ch == 3:
-        system("cls")
-        Update_Supervisor()
-    elif ch == 4:
-        system("cls")
-        Remove_supervisor()
-    elif ch == 5:
-        system("cls")
-        Search_supervisor()
-    elif ch == 6:
-        system("cls")
-        print("{:>60}".format("Have A NIce Day :)"))
-        exit(0)
-    else:
-        print("Invalid Choice!")
-        press = input("Press Any key To Continue..")
-        menu()
-
 def worksTable():
     print("{:>60}".format("-->> WORKS ON TABLE <<--"))    
     print("1. Add WORKS")
@@ -1552,7 +1358,7 @@ def worksTable():
     print("4. Remove WORKS Record")
     print("5. Search WORKS Record")
     print("6. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
+    print("{:>66}".format("-->> Choice Options: [1/2/3/4/5/6] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1582,19 +1388,18 @@ def worksTable():
 # Menu function to display menu
 def menu():
     system("cls")
-    print("{:>60}".format("************************************"))
-    print("{:>60}".format("-->> Employee Management System <<--"))
-    print("{:>60}".format("************************************"))
+    print("{:>80}".format("************************************"))
+    print("{:>80}".format("-->> Employee Management System <<--"))
+    print("{:>80}".format("************************************"))
     print("1. Employee TABLE")
     print("2. ATTENDANCE TABLE")
     print("3. DEPARTMENT TABLE")
     print("4. DEPENDENT TABLE")
     print("5. JOB_TITLE TABEL")
     print("6. PROJECT TABEL")
-    print("7. SUPERVISOR TABEL")
-    print("8. WORKS TABEL")
-    print("9. Exit\n")
-    print("{:>60}".format("-->> Choice Options: [1/2/3/4/5/6/7/8/9] <<--"))
+    print("7. WORKS TABEL")
+    print("8. Exit\n")
+    print("{:>85}".format("-->> Choice Options: [1/2/3/4/5/6/7/8] <<--"))
 
     ch = int(input("Enter your Choice: "))
     if ch == 1:
@@ -1617,13 +1422,10 @@ def menu():
         projectTable()
     elif ch == 7:
         system("cls")
-        supervisorTable()
+        worksTable()
     elif ch == 8:
         system("cls")
-        worksTable()
-    elif ch == 9:
-        system("cls")
-        print("{:>60}".format("Have A NIce Day :)"))
+        print("{:>80}".format("Have A NIce Day :)"))
         exit(0)
     else:
         print("Invalid Choice!")
