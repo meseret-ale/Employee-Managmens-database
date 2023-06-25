@@ -1,3 +1,5 @@
+-- Author: Meseret Alemnew Melese
+
 DROP DATABASE IF EXISTS EmployeeDB;
 CREATE DATABASE EmployeeDB;
 use EmployeeDB;
