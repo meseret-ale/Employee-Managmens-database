@@ -346,6 +346,17 @@ def check_employee(employee_id):
     else:
         return False
 
+def check_employee_job(employee_id):
+    sql = 'select * from employee where JOB_TITLE_ID=%s'
+    c = con.cursor(buffered=True)
+    data = (employee_id,)
+    c.execute(sql, data)
+    r = c.rowcount
+    if r >= 1:
+        return True
+    else:
+        return False
+
 def check_job_title(job_title_id):
     sql = 'select * from job_titles where JOB_TITLE_ID=%s'
     c = con.cursor(buffered=True)
@@ -698,50 +709,28 @@ def Remove_Employ():
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
+
         if(check_work_e(Id) == True):
             sql = 'delete from works where EMPLOYEE_ID = %s'
             data = (Id,)
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
-        if(check_DEPENDENT_E(Id) == True):
-            sql = 'delete from dependent where EMPLOYEE_ID = %s'
-            data = (Id,)
+            
+        if(check_DEPENDENT_E(Id) == True):        
+            sql = 'UPDATE dependent set employee_id = %s where employee_id = %s'
+            data = (None, Id)
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
-        if(check_DEPARTMENT_E(Id) == True):
-            sql = 'select department_name from department where EMPLOYEE_ID = %s'
-            data = (Id,)
+            
+        if(check_DEPARTMENT_E(Id) == True):      
+            sql = 'UPDATE department set employee_id = %s where employee_id = %s'
+            data = (None, Id)
             c = con.cursor()
             c.execute(sql, data)
-            department_ids = c.fetchall()
-            for i in range(len(department_ids)):
-                department_id = department_ids[i][0]
-                if(check_PROJECT_D(department_id) == True):
-                    sql = 'select project_ID from project where department_name = %s'
-                    data = (department_id,)
-                    c = con.cursor()
-                    c.execute(sql, data)
-                    project_ids = c.fetchall()
-                    for i in range(len(project_ids)):
-                        project_id = project_ids[i][0]
-                        sql = 'delete from works where project_name = %s'
-                        data = (project_id,)
-                        c = con.cursor()
-                        c.execute(sql, data)
-                        con.commit()
-                    sql = 'delete from project where department_name = %s'
-                    data = (department_id,)
-                    c = con.cursor()
-                    c.execute(sql, data)
-                    con.commit()
-                sql = 'delete from department where department_name = %s'
-                data = (department_id,)
-                c = con.cursor()
-                c.execute(sql, data)
-                con.commit()
-                
+            con.commit()
+            
         sql = 'delete from employee where EMPLOYEE_ID = %s'
         data = (Id,)
         c = con.cursor()
@@ -758,6 +747,7 @@ def Remove_Attendance():
         print("Attendance Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
+
     else:
         sql = 'delete from attendance where attendance_ID = %s'
         data = (Id,)
@@ -770,28 +760,16 @@ def Remove_Attendance():
 
 def Remove_Department():
     print("{:>60}".format("-->> Remove Department Record <<--\n"))
-    Id = input("Enter Department Id: ")
+    Id = input("Enter Department Name: ")
     if(check_DEPARTMENT(Id) == False):
         print("Department Record Not exists\nTry Again")
         press = input("Press Any Key To Continue..")
         menu()
     
     else:
-        if(check_PROJECT_D(Id) == True):
-            sql = 'select project_ID from project where department_name = %s'
-            data = (Id,)
-            c = con.cursor()
-            c.execute(sql, data)
-            project_ids = c.fetchall()
-            for i in range(len(project_ids)):
-                project_id = project_ids[i][0]
-                sql = 'delete from works where project_name = %s'
-                data = (project_id,)
-                c = con.cursor()
-                c.execute(sql, data)
-                con.commit()
-            sql = 'delete from project where department_name = %s'
-            data = (Id,)
+        if(check_PROJECT_D(Id) == True):      
+            sql = 'UPDATE project set department_name = %s where department_name = %s'
+            data = (None, Id)
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
@@ -832,69 +810,13 @@ def Remove_job_titles():
         menu()
 
     else:
-        sql = 'select EMPLOYEE_ID from employee where JOB_TITLE_ID = %s'
-        data = (Id,)
-        c = con.cursor()
-        c.execute(sql, data)
-        EMPLOYEE_IDS = c.fetchall()
-        for i in range(len(EMPLOYEE_IDS)):
-            EMPLOYEE_ID = EMPLOYEE_IDS[i][0]
-            if(check_Attendance_E(EMPLOYEE_ID) == True):
-                sql = 'delete from attendance where EMPLOYEE_ID = %s'
-                data = (EMPLOYEE_ID,)
-                c = con.cursor()
-                c.execute(sql, data)
-                con.commit()
-            if(check_work_e(EMPLOYEE_ID) == True):
-                sql = 'delete from works where EMPLOYEE_ID = %s'
-                data = (EMPLOYEE_ID,)
-                c = con.cursor()
-                c.execute(sql, data)
-                con.commit()
-            if(check_DEPENDENT_E(EMPLOYEE_ID) == True):
-                sql = 'delete from dependent where EMPLOYEE_ID = %s'
-                data = (EMPLOYEE_ID,)
-                c = con.cursor()
-                c.execute(sql, data)
-                con.commit()
-            if(check_DEPARTMENT_E(EMPLOYEE_ID) == True):
-                sql = 'select department_name from department where EMPLOYEE_ID = %s'
-                data = (EMPLOYEE_ID,)
-                c = con.cursor()
-                c.execute(sql, data)
-                department_ids = c.fetchall()
-                for i in range(len(department_ids)):
-                    department_id = department_ids[i][0]
-                    if(check_PROJECT_D(department_id) == True):
-                        sql = 'select project_name from project where department_name = %s'
-                        data = (department_id,)
-                        c = con.cursor()
-                        c.execute(sql, data)
-                        project_ids = c.fetchall()
-                        for i in range(len(project_ids)):
-                            project_id = project_ids[i][0]
-                            sql = 'delete from works where project_ID = %s'
-                            data = (project_id,)
-                            c = con.cursor()
-                            c.execute(sql, data)
-                            con.commit()
-                        sql = 'delete from project where department_name = %s'
-                        data = (department_id,)
-                        c = con.cursor()
-                        c.execute(sql, data)
-                        con.commit()
-                    sql = 'delete from department where department_name = %s'
-                    data = (department_id,)
-                    c = con.cursor()
-                    c.execute(sql, data)
-                    con.commit()
-                    
-            sql = 'delete from employee where EMPLOYEE_ID = %s'
-            data = (EMPLOYEE_ID,)
+        if check_employee_job(id):        
+            sql = 'UPDATE employee set JOB_TITLE_ID = %s where JOB_TITLE_ID = %s'
+            data = (None, Id)
             c = con.cursor()
             c.execute(sql, data)
             con.commit()
-        
+
         sql = 'delete from job_titles where JOB_TITLE_ID = %s'
         data = (Id,)
         c = con.cursor()
